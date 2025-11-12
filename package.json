@@ -24,6 +24,7 @@
     "autoprefixer": "^10.4.20",
     "axios": "^1.13.2",
     "dotenv": "^17.2.3",
+    "formidable": "^3.5.4",
     "franc": "^6.2.0",
     "langs": "^2.0.0",
     "mysql2": "^3.15.3",
