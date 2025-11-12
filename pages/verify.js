@@ -1,98 +1,72 @@
-import { useState, useEffect } from "react";
-import { Html5Qrcode } from "html5-qrcode";
-import { motion } from "framer-motion";
+import { useState } from "react";
 
-export default function Verify() {
+export default function VerifyCertificate() {
   const [code, setCode] = useState("");
-  const [details, setDetails] = useState(null);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState("");
 
-  // Function to verify certificate
-  async function verifyCertificate(code) {
+  const handleCheck = async () => {
+    setError("");
+    setResult(null);
     try {
       const res = await fetch(`/api/verify?code=${code}`);
       const data = await res.json();
-
-      if (res.ok) {
-        setDetails(data);
+      if (data.error) {
+        setError("❌ Certificate not found");
       } else {
-        setDetails({
-          name: "Invalid",
-          issuedBy: "",
-          date: "",
-          status: "Invalid",
-        });
+        setResult(data);
       }
-    } catch (error) {
-      console.error("Error verifying certificate:", error);
-      setDetails({
-        name: "Error",
-        issuedBy: "",
-        date: "",
-        status: "Error",
-      });
+    } catch (err) {
+      setError("⚠️ Something went wrong. Please try again.");
     }
-  }
-
-  // Start QR scanning
-  useEffect(() => {
-    const html5QrCode = new Html5Qrcode("reader");
-    const config = { fps: 10, qrbox: 250 };
-
-    html5QrCode.start(
-      { facingMode: "environment" },
-      config,
-      (decodedText) => {
-        setCode(decodedText);
-        verifyCertificate(decodedText);
-        html5QrCode.stop();
-      },
-      (error) => {
-        console.warn("QR scanning error:", error);
-      }
-    );
-
-    return () => {
-      html5QrCode.stop().catch(() => {});
-    };
-  }, []);
+  };
 
   return (
-    <main style={{ textAlign: "center", marginTop: "2rem" }}>
-      <div
-        id="reader"
-        style={{
-          width: "300px",
-          margin: "auto",
-          border: "2px dashed #ccc",
-          borderRadius: "10px",
-          padding: "10px",
-        }}
-      >
-        <p style={{ textAlign: "center" }}>
-          Align the QR code within this box to verify.
+    <div className="min-h-screen flex flex-col items-center justify-center bg-sikhulumaBlue text-white p-6">
+      <div className="bg-white text-gray-900 rounded-2xl shadow-2xl p-8 w-full max-w-md">
+        <h1 className="text-3xl font-bold text-center text-sikhulumaBlue mb-4">
+          Sikhuluma.AI Certificate Verification
+        </h1>
+        <p className="text-center mb-6 text-gray-600">
+          Enter your certificate code below:
         </p>
+
+        <div className="flex gap-2 justify-center mb-6">
+          <input
+            type="text"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            placeholder="e.g. PEJU321"
+            className="border border-gray-300 rounded-md p-2 w-2/3 focus:outline-none focus:ring-2 focus:ring-sikhulumaGreen"
+          />
+          <button
+            onClick={handleCheck}
+            className="bg-sikhulumaGreen hover:bg-emerald-500 text-white font-semibold px-4 py-2 rounded-md transition duration-200"
+          >
+            Verify
+          </button>
+        </div>
+
+        {error && (
+          <p className="text-red-500 text-center font-medium">{error}</p>
+        )}
+
+        {result && (
+          <div className="bg-emerald-50 border border-sikhulumaGreen rounded-lg p-4 mt-6 text-gray-800">
+            <h2 className="text-xl font-bold text-sikhulumaGreen mb-2">
+              ✅ Certificate Verified
+            </h2>
+            <p><b>Name:</b> {result.name}</p>
+            <p><b>Issued By:</b> {result.issuedBy}</p>
+            <p><b>Date:</b> {result.date}</p>
+            <p><b>Status:</b> {result.status}</p>
+          </div>
+        )}
       </div>
 
-      {details && (
-        <motion.div
-          animate={{ boxShadow: "0 0 20px #22c55e" }}
-          transition={{ duration: 1 }}
-          className="rounded-lg p-4 bg-white text-center mt-6 border-2 border-green-500"
-        >
-          <p>
-            <strong>Holder Name:</strong> {details.name}
-          </p>
-          <p>
-            <strong>Issued By:</strong> {details.issuedBy}
-          </p>
-          <p>
-            <strong>Date of Issue:</strong> {details.date}
-          </p>
-          <p>
-            <strong>Status:</strong> {details.status}
-          </p>
-        </motion.div>
-      )}
-    </main>
+      <p className="mt-6 text-sm text-gray-200">
+        © 2025 Sikhuluma.AI — Empowering African Languages with AI
+      </p>
+    </div>
   );
 }

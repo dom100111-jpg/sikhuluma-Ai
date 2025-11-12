@@ -1,33 +1,119 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-white via-blue-50 to-blue-100 text-center p-6">
-      <h1 className="text-5xl font-extrabold text-blue-700 mb-4">
+    <div
+      style={{
+        textAlign: "center",
+        padding: "80px 20px",
+        backgroundColor: "#f9f9f9",
+        minHeight: "100vh",
+      }}
+    >
+      {/* Main Title */}
+      <h1
+        style={{
+          color: "#004aad",
+          fontSize: "2.8rem",
+          marginBottom: "10px",
+          fontWeight: "bold",
+        }}
+      >
         SIKHULUMA AI
       </h1>
-      <h2 className="text-xl text-gray-700 mb-10">
-        Founded by <span className="font-semibold text-blue-600">Dominic Dlamini</span><br />
-        <span className="text-sm text-gray-600">Sikhuluma Global Council</span>
-      </h2>
 
-<div className="flex flex-col sm:flex-row gap-4">
-  <a  href="/learn" className="bg-blue-600 text-white px-6 py-3 rounded-xl shadow hover:bg-blue-700 transition">
-  Learn siSwati
+      <p
+        style={{
+          fontSize: "1.2rem",
+          color: "#333",
+          marginBottom: "30px",
+        }}
+      >
+        Founded by <strong>Dominic Dlamini</strong> <br />
+        Sikhuluma Global Council
+      </p>
 
-  </a>
+      {/* Action Buttons */}
+      <div style={{ marginTop: "30px" }}>
+        <Link href="/learn">
+          <button
+            style={{
+              backgroundColor: "#004aad",
+              color: "white",
+              border: "none",
+              borderRadius: "6px",
+              padding: "12px 22px",
+              margin: "8px",
+              fontSize: "16px",
+              cursor: "pointer",
+            }}
+          >
+            Learn siSwati
+          </button>
+        </Link>
 
-  <button className="bg-yellow-500 text-white px-6 py-3 rounded-xl shadow hover:bg-yellow-600">
-    Translate
-  </button>
+        <Link href="/translate">
+          <button
+            style={{
+              backgroundColor: "#f9a825",
+              color: "white",
+              border: "none",
+              borderRadius: "6px",
+              padding: "12px 22px",
+              margin: "8px",
+              fontSize: "16px",
+              cursor: "pointer",
+            }}
+          >
+            Translate
+          </button>
+        </Link>
 
-  <button className="bg-green-600 text-white px-6 py-3 rounded-xl shadow hover:bg-green-700">
-    Verify Certificate (PEJU)
-  </button>
-</div>
+        <Link href="/verify">
+          <button
+            style={{
+              backgroundColor: "#43a047",
+              color: "white",
+              border: "none",
+              borderRadius: "6px",
+              padding: "12px 22px",
+              margin: "8px",
+              fontSize: "16px",
+              cursor: "pointer",
+            }}
+          >
+            Verify Certificate (PEJU)
+          </button>
+        </Link>
+      </div>
 
+      {/* Footer */}
+      <p
+        style={{
+          marginTop: "50px",
+          color: "#777",
+          fontSize: "14px",
+        }}
+      >
+        © 2025 Sikhuluma AI — Empowering African Languages
+      </p>
 
-      <footer className="mt-12 text-sm text-gray-500">
-        © {new Date().getFullYear()} Sikhuluma AI — Empowering African Languages
-      </footer>
-    </main>
+      {/* Founder Shortcut (Hidden Admin Access) */}
+      <div style={{ marginTop: "40px" }}>
+        <a
+          href="/admin"
+          style={{
+            backgroundColor: "#222",
+            color: "white",
+            padding: "10px 20px",
+            borderRadius: "6px",
+            textDecoration: "none",
+            fontSize: "14px",
+          }}
+        >
+          👑 Admin Panel
+        </a>
+      </div>
+    </div>
   );
 }

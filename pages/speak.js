@@ -1,23 +1,48 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function VoicePage() {
+export default function SpeakPage() {
+  const [dictionary, setDictionary] = useState({});
   const [word, setWord] = useState("");
-  const [translation, setTranslation] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [voiceLang, setVoiceLang] = useState("Siswati"); // default language
+  const [meaning, setMeaning] = useState("");
+  const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [voiceLang, setVoiceLang] = useState("Siswati");
 
-  // 🗣️ Speak a word using OpenAI voice API
-  const speakWord = async (text, language) => {
+  // ✅ Load Siswati dictionary from /public/siswatiDictionary.json
+  useEffect(() => {
+    fetch("/siswatiDictionary.json")
+      .then((res) => res.json())
+      .then((data) => {
+        setDictionary(data);
+        setStatus("Dictionary loaded successfully ✅");
+      })
+      .catch((err) => {
+        console.error("Error loading dictionary:", err);
+        setStatus("❌ Error loading dictionary");
+      });
+  }, []);
+
+  // 🧠 Translate word
+  const handleTranslate = () => {
+    const lowerWord = word.toLowerCase();
+    if (dictionary[lowerWord]) {
+      setMeaning(dictionary[lowerWord]);
+    } else {
+      setMeaning("Word not found in dictionary ❌");
+    }
+  };
+
+  // 🗣️ Speak using OpenAI voice API
+  const handleSpeak = async (text, lang) => {
     try {
-      setIsLoading(true);
+      setLoading(true);
       const res = await fetch("/api/generateVoice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ word: text, language }),
+        body: JSON.stringify({ word: text, language: lang }),
       });
-
       const data = await res.json();
-      setIsLoading(false);
+      setLoading(false);
 
       if (data.audioUrl) {
         const audio = new Audio(data.audioUrl);
@@ -28,84 +53,61 @@ export default function VoicePage() {
     } catch (error) {
       console.error("Error generating voice:", error);
       alert("Error generating voice.");
-      setIsLoading(false);
-    }
-  };
-
-  // 🧠 Translate (fetch meaning from dictionary)
-  const translateWord = async () => {
-    setIsLoading(true);
-    try {
-      const res = await fetch("/siswatiDictionary.json");
-      const data = await res.json();
-
-      const lowerWord = word.toLowerCase();
-      const meaning = data[lowerWord] || "Word not found in dictionary";
-
-      setTranslation(meaning);
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Error loading dictionary:", error);
-      setTranslation("Error loading dictionary.");
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
     <div style={{ textAlign: "center", padding: "40px" }}>
       <h1 style={{ color: "#004aad", marginBottom: "20px" }}>
-        🗣️ Siswati Voice Trainer
+        🗣️ Speak Siswati or English
       </h1>
-      <p>
-        Type any <b>Siswati</b> or <b>English</b> word below and listen to how
-        it’s pronounced.
-      </p>
+      <p>Type a Siswati word, view its English meaning, and hear it spoken aloud.</p>
 
       <input
         type="text"
         value={word}
         onChange={(e) => setWord(e.target.value)}
-        placeholder="Enter word..."
+        placeholder="Type word here..."
         style={{
           padding: "10px",
-          fontSize: "16px",
           width: "300px",
-          borderRadius: "6px",
+          fontSize: "16px",
+          borderRadius: "8px",
           border: "1px solid #ccc",
-          marginTop: "20px",
         }}
       />
       <br />
 
       <button
-        onClick={translateWord}
+        onClick={handleTranslate}
         style={{
           marginTop: "15px",
+          padding: "10px 20px",
           backgroundColor: "#007bff",
           color: "white",
-          padding: "10px 20px",
           border: "none",
           borderRadius: "6px",
           cursor: "pointer",
         }}
       >
-        {isLoading ? "Loading..." : "Translate"}
+        {loading ? "Loading..." : "Translate"}
       </button>
 
       <div style={{ marginTop: "25px", fontSize: "18px" }}>
         {word && (
           <p>
-            <b>{word}</b> → {translation}
+            <b>{word}</b> → {meaning}
           </p>
         )}
       </div>
 
-      {translation && translation !== "Word not found in dictionary" && (
+      {meaning && meaning !== "Word not found in dictionary ❌" && (
         <div style={{ marginTop: "20px" }}>
           <button
-            onClick={() => speakWord(word, "Siswati")}
+            onClick={() => handleSpeak(word, "Siswati")}
             style={{
-              backgroundColor: "#1f8b4c",
+              backgroundColor: "#198754",
               color: "white",
               padding: "10px 20px",
               borderRadius: "6px",
@@ -118,7 +120,7 @@ export default function VoicePage() {
           </button>
 
           <button
-            onClick={() => speakWord(translation, "English")}
+            onClick={() => handleSpeak(meaning, "English")}
             style={{
               backgroundColor: "#6f42c1",
               color: "white",
@@ -132,6 +134,8 @@ export default function VoicePage() {
           </button>
         </div>
       )}
+
+      <p style={{ marginTop: "40px", color: "#555" }}>{status}</p>
     </div>
   );
 }
